@@ -1,0 +1,20 @@
+table, th, td {
+    border: 1px solid black;
+  }
+table {
+    margin-top: 20px;
+    width: 90%;
+}
+.active {
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 5px;
+}
+.virtual-scroll-table-container {
+  height: 300px;
+  overflow-y: auto;
+}
+.virtual-scroll-table {
+  width: 100%;
+  border-collapse: collapse;
+}

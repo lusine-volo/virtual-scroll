@@ -1,0 +1,23 @@
+@let data = vm();
+@if(data.loading) {
+  <div>...loading</div>
+} @else {
+  <div class="virtual-scroll-table-container" #scrollContainer (scroll)="loadMore()">
+    <table class="virtual-scroll-table">
+      <tr>
+        @for(item of headerItems(); track item) {
+          <th>{{item}}</th>
+        }
+      </tr>
+      @for(item of visibleItems(); track item.name) {
+        <tr>
+          <td>{{item.name.official}}</td>
+          <td>{{item.capital ? item.capital[0] : '-'}}</td>
+          <td [class.active]="item.independent">{{item.independent ? 'Yes' : 'No'}}</td>
+        </tr>
+      } @empty {
+        <span>There are no countries.</span>
+      }
+    </table>
+  </div>
+}
