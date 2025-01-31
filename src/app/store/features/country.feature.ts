@@ -50,7 +50,6 @@ export const countryFeature = createFeature({
       selectCurrentPage,
       selectItemParePage,
       (countryList, currentPage, itemParePage) => {
-        console.log([...countryList].slice(0, (currentPage + 1) * itemParePage));
         return [...countryList].slice(0, (currentPage + 1) * itemParePage);
       }
 
