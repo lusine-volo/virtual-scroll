@@ -9,18 +9,27 @@ export const countryReducer = createReducer(
   immerOn(
     CountryActions.loadData, (state, { params }) => {
       state.loading = true;
-      state.searchQuery = params.query;
       state.currentPage = params.end;
+    }),
+
+  immerOn(
+    CountryActions.addSuggestion, (state, { params }) => {
+      state.searchQuery = params.query;
+      const suggestionList = state.suggestionList;
+      const addListItem = params.query && !suggestionList.includes(params.query);
+      state.suggestionList = addListItem ? [...suggestionList, params.query] : [...suggestionList];
     }),
 
   immerOn(
     CountryActions.search, (state) => {
       state.currentPage = 1;
+      state.startSearching = true;
     }),
 
   immerOn(
-    CountryActions.loadDataSuccess, (state, { data }) => {
+    CountryActions.loadDataSuccess, (state, { data, totalCount }) => {
       state.countryList = data;
+      state.totalCount = totalCount;
       state.loading = false;
     }),
 
@@ -43,16 +52,24 @@ export const countryFeature = createFeature({
   extraSelectors: ({
     selectCountryList,
     selectCurrentPage,
-    selectItemParePage
+    selectItemParePage,
+    selectSearchQuery,
+    selectSuggestionList
   }) => ({
     selectVisibleItemst: createSelector(
       selectCountryList,
       selectCurrentPage,
       selectItemParePage,
       (countryList, currentPage, itemParePage) => {
-        return [...countryList].slice(0, (currentPage + 1) * itemParePage);
+        return [...countryList].slice(0, currentPage * itemParePage);
       }
-
+    ),
+    selectSuggestionQueries: createSelector(
+      selectSearchQuery,
+      selectSuggestionList,
+      (searchQuery, suggestionList) => {
+        return [...suggestionList].filter(item => item.includes(searchQuery.toLocaleLowerCase()));
+      }
     ),
   }),
 });

@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 
 import { Store } from '@ngrx/store';
 
@@ -9,7 +9,8 @@ import { CountryActions } from '../../../store/actions/country.actions';
   selector: 'app-table',
   imports: [],
   templateUrl: './table.component.html',
-  styleUrl: './table.component.scss'
+  styleUrl: './table.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableComponent implements OnInit {
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
@@ -27,22 +28,20 @@ export class TableComponent implements OnInit {
     end: 1,
   };
   scrollTop = window.scrollY;
-  itemHeight: number = 40;
-  visibleCount = signal<number>(Math.floor(800 / this.itemHeight));
 
   ngOnInit(): void {
     this.store.dispatch(CountryActions.loadData({ params: this.params }));
   }
 
   loadMore(): void {
+    this.scrollTop = +this.vm().startSearching || window.scrollY;
     const container = this.scrollContainer.nativeElement;
     const scrollTop = container.scrollTop;
     const bottom = container.scrollHeight === (container.scrollTop + container.clientHeight);
-    if (scrollTop > this.scrollTop && !bottom) {
+    if (scrollTop > this.scrollTop && bottom && this.vm().totalCount > this.visibleItems().length) {
       this.scrollTop = scrollTop;
-      const start = Math.floor(scrollTop / this.itemHeight);
       const end = this.currentPage() + 1;
-      const params = { query: this.searchQuery(), start, end };
+      const params = { ...this.params, query: this.searchQuery(), end };
       this.store.dispatch(CountryActions.loadMore({ params }));
     }
   }

@@ -16,8 +16,8 @@ export const loadData$ = createEffect(
             ofType(CountryActions.loadData),
             switchMap(({ params }) =>
                 countryService.loadData(params).pipe(
-                    map((res) => CountryActions.loadDataSuccess({ data: res })),
-                    catchError((error) => of(CountryActions.loadDataSuccess({ data: [] })))
+                    map((res) => CountryActions.loadDataSuccess(res)),
+                    catchError((error) => of(CountryActions.loadDataSuccess({data: [], totalCount: 0, success: true})))
                 )
             )
         );
@@ -33,8 +33,21 @@ export const search$ = createEffect(
             ofType(CountryActions.search),
             debounceTime(700),
             distinctUntilChanged(),
+            map(({ params }) => CountryActions.addSuggestion({ params }))
+        );
+    },
+    { functional: true }
+);
+
+export const addSuggestion$ = createEffect(
+    (
+        actions = inject(Actions),
+    ) => {
+        return actions.pipe(
+            ofType(CountryActions.addSuggestion),
             map(({ params }) => CountryActions.loadData({ params }))
         );
     },
     { functional: true }
 );
+

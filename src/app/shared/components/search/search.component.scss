@@ -1,3 +1,17 @@
 input {
     margin-top: 20px;
 }
+
+.active {
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+}
+.tags {
+    display: flex;
+    flex-wrap: nowrap;
+}
+.tags > div {
+    padding: 5px;
+    margin-top: 5px;
+}

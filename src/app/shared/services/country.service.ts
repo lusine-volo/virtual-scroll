@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 
-import { Country } from '../interfaces';
+import { Country, HttpSuccessResponse } from '../interfaces';
 import { Params } from '../params.type';
 
 @Injectable({
@@ -17,10 +17,16 @@ export class CountryService {
   private readonly store = inject(Store);
   private baseUrl ='https://restcountries.com/v3.1';
 
-  loadData(params: Params) : Observable<Country[]> {
+  loadData(params: Params) : Observable<HttpSuccessResponse<Country>> {
     const { query } = params;
     const url = `${this.baseUrl}/${query ? `name/${query}` : 'all'}`;
-    return this.http.get<Country[]>(url);
+    return this.http.get<Country[]>(url).pipe(
+      map((res: Country[]) => ({
+        data: res,
+        totalCount: res.length || 0,
+        success: !!res,
+      }))
+    );
   }
 
 }
